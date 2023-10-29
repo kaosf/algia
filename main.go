@@ -299,7 +299,7 @@ func (cfg *Config) Decode(ev *nostr.Event) error {
 	var pub string
 	if _, s, err := nip19.Decode(cfg.PrivateKey); err != nil {
 		if _, p, err := nip19.Decode(cfg.PublicKey); err != nil {
-			return nil
+			return err
 		} else {
 			pub = p.(string)
 			sk = "invalid-secret-key"

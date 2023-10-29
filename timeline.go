@@ -821,14 +821,11 @@ func doStream(cCtx *cli.Context) error {
 
 	var sk string
 	if _, s, err := nip19.Decode(cfg.PrivateKey); err != nil {
-		return err
+		sk = "invalid-secret-key"
 	} else {
 		sk = s.(string)
 	}
-	pub, err := nostr.GetPublicKey(sk)
-	if err != nil {
-		return err
-	}
+	var pub = cfg.PublicKey
 
 	// get followers
 	var follows []string

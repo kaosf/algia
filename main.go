@@ -38,6 +38,7 @@ type Config struct {
 	Relays     map[string]Relay   `json:"relays"`
 	Follows    map[string]Profile `json:"follows"`
 	PrivateKey string             `json:"privatekey"`
+	PublicKey  string             `json:"publickey"`
 	Updated    time.Time          `json:"updated"`
 	Emojis     map[string]string  `json:"emojis"`
 	verbose    bool
@@ -123,7 +124,11 @@ func (cfg *Config) GetFollows(profile string) (map[string]Profile, error) {
 	var mu sync.Mutex
 	var pub string
 	if _, s, err := nip19.Decode(cfg.PrivateKey); err != nil {
-		return nil, err
+		if _, p, err := nip19.Decode(cfg.PublicKey); err != nil {
+			return nil, err
+		} else {
+			pub = p.(string)
+		}
 	} else {
 		if pub, err = nostr.GetPublicKey(s.(string)); err != nil {
 			return nil, err
@@ -293,7 +298,12 @@ func (cfg *Config) Decode(ev *nostr.Event) error {
 	var sk string
 	var pub string
 	if _, s, err := nip19.Decode(cfg.PrivateKey); err != nil {
-		return err
+		if _, p, err := nip19.Decode(cfg.PublicKey); err != nil {
+			return nil
+		} else {
+			pub = p.(string)
+			sk = "invalid-secret-key"
+		}
 	} else {
 		sk = s.(string)
 		if pub, err = nostr.GetPublicKey(s.(string)); err != nil {
